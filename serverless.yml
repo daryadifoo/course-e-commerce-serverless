@@ -1,0 +1,90 @@
+# Welcome to Serverless!
+#
+# This file is the main config file for your service.
+# It's very minimal at this point and uses default values.
+# You can always add more config options for more control.
+# We've included some commented out config examples here.
+# Just uncomment any of them to get that config option.
+#
+# For full config options, check the docs:
+#    docs.serverless.com
+#
+# Happy Coding!
+
+service: eduqat
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: dev
+  region: us-west-2
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: arn:aws:dynamodb:us-west-2:*:*
+
+functions:
+  create:
+    handler: handler.createCourse
+    events:
+      - http:
+          path: courses
+          method: post
+          cors: true
+
+  list:
+    handler: handler.listCourse
+    events:
+      - http:
+          path: courses
+          method: get
+          cors: true
+
+  get:
+    handler: handler.getCourse
+    events:
+      - http:
+          path: courses/{id}
+          method: get
+          cors: true
+
+  update:
+    handler: handler.updateCourse
+    events:
+      - http:
+          path: courses/{id}
+          method: put
+          cors: true
+
+  delete:
+    handler: handler.deleteCourse
+    events:
+      - http:
+          path: courses/{id}
+          method: delete
+          cors: true
+
+resources:
+  Resources:
+    CoursesTable:
+      Type: "AWS::DynamoDB::Table"
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: "courses"
